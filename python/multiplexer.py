@@ -37,8 +37,7 @@ def main():
 
     # Initialize consumer variable
     consumer = KafkaConsumer (topicName, group_id ='group1',bootstrap_servers =
-    bootstrap_servers,enable_auto_commit=True)
-  
+    bootstrap_servers,enable_auto_commit=True)  
     
     # Read and print message from consumer
     for msg in consumer:

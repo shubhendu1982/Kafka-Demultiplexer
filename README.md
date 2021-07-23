@@ -16,7 +16,14 @@ docker run --net=host --rm confluentinc/cp-kafka:latest kafka-topics --create --
 # Task 2 - Simple Consumer
     # a) Come up with a simple algorithm to read the messages and write them to data-output in the desired way
         # intert item in sorted order in the list            
-          bisect.insort(list, n)             
+            1) # search for right index where the data needs to be inserted to maintain the sorted order 
+            for i in range(len(msglist)):    
+                if msglist[i] > n:
+                    index = i
+                    break
+        
+            2) # Inserting the item in the list in the index determined in the previous stage
+            msglist = msglist[:i] + [n] + msglist[i:]             
 
     # b) Realize your algorithm from a) in python3 using you Environment from Task 1.
 
