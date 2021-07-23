@@ -10,11 +10,12 @@ with open("input.txt") as myfile:
         # populate key and value
         record_key, record_value = line.partition(":")[::2] 
         record_value=record_value.strip()
+        record_key = int(record_key)
 
         print("Producing record: {}\t{}".format(record_key, record_value))
 
         # produce data  topic and publish into into topic: data-input
-        producer.send('data-input', key=record_key.encode('UTF-8'), value=record_value.encode('UTF-8'))
+        producer.send('data-input', value=record_value.encode('UTF-8'), partition=record_key)
 
 print("Produced record...")
 
