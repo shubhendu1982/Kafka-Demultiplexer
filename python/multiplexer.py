@@ -11,6 +11,7 @@ msglist = []
 
 # intert item in sorted order in the list
 def insert(list, n): 
+    # inset the new element in sorted order
     bisect.insort(list, n)  
     return list
 
@@ -33,7 +34,7 @@ def main():
     # Read and print message from consumer
     for msg in consumer:
      print("Topic Name=%s,Message=%s"%(msg.topic,msg.value.decode('UTF-8')))    
-     insert(msglist, msg.value)
+     insert(msglist, int(msg.value))
 
     # Terminate the script
     sys.exit()
@@ -49,4 +50,4 @@ if __name__ == "__main__":
    producer = KafkaProducer(bootstrap_servers='localhost:29092')
    for x in range(len(msglist)): 
     print(msglist[x]) 
-    producer.send('data-output', msglist[x])
+    producer.send('data-output', str(msglist[x]).encode('UTF-8'))
