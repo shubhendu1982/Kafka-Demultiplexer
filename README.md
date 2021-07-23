@@ -25,6 +25,7 @@ docker run --net=host --rm confluentinc/cp-kafka:latest kafka-topics --create --
 
         # Install kafka-python client  lib 
         pip install kafka-python
+        NB: it is assumed python compiler is already installed (i have used Python 3.9.6)
 
         # Produce data in kafka from input.txt
         python producer.py
