@@ -1,6 +1,7 @@
 # Import KafkaConsumer from Kafka library
 from kafka import KafkaConsumer
 from kafka import KafkaProducer
+from kafka import TopicPartition
 
 import bisect
 
@@ -9,6 +10,15 @@ import sys
 
 msglist = []
 
+# validate total arguments
+n = len(sys.argv)
+if(n!=2) :
+   print("Partition id needs to be passed")
+   sys.exit()
+
+# print partition no
+print("Partitation Id=%s"%(sys.argv[1]))      
+
 # intert item in sorted order in the list
 def insert(list, n): 
     # inset the new element in sorted order
@@ -16,20 +26,21 @@ def insert(list, n):
     return list
 
 ## all your app logic here
-def main():
-   ## whatever your app does.
+def main():  
     # Define server with port
     bootstrap_servers = ['localhost:29092']
-
-    # Define topic name from where the message will recieve
+   # Define topic name from where the message will recieve
     topicName = 'data-input'
 
     # Initialize consumer variable
-    consumer = KafkaConsumer (topicName, group_id ='group1',bootstrap_servers =
-    bootstrap_servers,enable_auto_commit=True)
+    consumer = KafkaConsumer(
+    bootstrap_servers=bootstrap_servers, auto_offset_reset='earliest')
+   
+    # Read the specified partition
+    consumer.assign([TopicPartition(topicName, int(sys.argv[1]))]) 
 
     # echo instructions
-    print("Press ctrl+c to run multiplexer")
+    print("Press ctrl+c to run multiplexer")     
     
     # Read and print message from consumer
     for msg in consumer:

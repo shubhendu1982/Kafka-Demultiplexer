@@ -16,8 +16,7 @@ docker run --net=host --rm confluentinc/cp-kafka:latest kafka-topics --create --
 # Task 2 - Simple Consumer
     # a) Come up with a simple algorithm to read the messages and write them to data-output in the desired way
         # intert item in sorted order in the list            
-          bisect.insort(list, n) 
-            
+          bisect.insort(list, n)             
 
     # b) Realize your algorithm from a) in python3 using you Environment from Task 1.
 
@@ -37,3 +36,24 @@ docker run --net=host --rm confluentinc/cp-kafka:latest kafka-topics --create --
         # Verify the sorted output in topic data-output
         docker run --net=host --rm confluentinc/cp-kafka:latest kafka-console-consumer --bootstrap-server localhost:29092 --topic data-output --from-beginning
 
+# Task 3 - Scalable Consumer
+
+    # a) Extend your algorithm from 2a to work concurrently. Each partition should be read by exactly one service.         
+        The same algorithm 2)a can be used in order to achive insert item into a list maintaining the order
+      
+    # b) Extend your implementation from 2b by the functionality described in 2a.
+        The below command can be used in order to read from a specified partition of a topic and hence it will be able to scale it self by specifying the command line argument to pass the partition no        
+        in the format scalableconsumer.py <partition no>  
+
+            The pogram can be executed parally like below exemple
+            python .\scalableconsumer.py 1
+            python .\scalableconsumer.py 2
+            python .\scalableconsumer.py 3
+            python .\scalableconsumer.py 4
+            .....
+            python .\scalableconsumer.py 9
+
+            which will read the message from a particular partition hence can be treated like seperate consumers
+
+
+      
