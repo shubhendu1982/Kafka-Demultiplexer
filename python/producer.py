@@ -2,8 +2,9 @@
 from kafka import KafkaProducer
 
 # define producer
-producer = KafkaProducer(bootstrap_servers='localhost:29092')
+producer = KafkaProducer(bootstrap_servers='localhost:29092',retries=5)
 
+count = 0
 # read data from input.txt
 with open("input.txt") as myfile:
      for line in myfile:
@@ -12,12 +13,13 @@ with open("input.txt") as myfile:
         record_value=record_value.strip()
         record_key = int(record_key)
 
-        print("Producing record: {}\t{}".format(record_key, record_value))
+        print("Producing record:  {} in the partitation: {}".format(record_value,record_key))
 
         # produce data  topic and publish into into topic: data-input
         producer.send('data-input', value=record_value.encode('UTF-8'), partition=record_key)
+        count = count + 1
+        
+print("Produced record...%s"%(count)) 
 
-print("Produced record...")
-
-# flish the producer
+# flush the producer
 producer.flush()

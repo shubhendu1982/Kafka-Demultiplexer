@@ -1,48 +1,52 @@
-# Import KafkaConsumer from Kafka library
+# Import Kafka libs from Kafka library
 from kafka import KafkaConsumer
 from kafka import KafkaProducer
-
-import bisect
 
 # Import sys module
 import sys
 
+# global messge array holds temporarily the messages from kafka topic 
 msglist = []
 
-# # intert item in sorted order in the list
-# def insert(list, n): 
-#     # inset the new element in sorted order
-#     bisect.insort(list, n)  
-#     return list
+# configurations
+#-------------------------------------------------------------------------
+# set the kafka server url
+bootstrap_server_addr =  'localhost:29092'
 
-def insert(n):
-    i = 0
-    global msglist
+# set input topic name
+input_topic_Name = 'data-input'
+output_topic_Name = 'data-output'
+#-------------------------------------------------------------------------  
+
+def insert(n):    
+    global msglist 
+    i= 0
     # Searching for the position   
     for i in range(len(msglist)):    
         if msglist[i] > n:
             index = i
             break
-      
-    # Inserting n in the list
-    msglist = msglist[:i] + [n] + msglist[i:]       
+        else: i = -1
+     
+    if i!= -1:
+        # Inserting n in the list
+        msglist = msglist[:i] + [n] + msglist[i:]          
+    else:
+        msglist.append(n)
 
 ## all your app logic here
-def main():
-    # Define server with port
-    bootstrap_servers = ['localhost:29092']
-
-    # Define topic name from where the message will recieve
-    topicName = 'data-input'
+def main():  
+    # Define server with port 
 
     # Initialize consumer variable
-    consumer = KafkaConsumer (topicName, group_id ='group1',bootstrap_servers =
-    bootstrap_servers,enable_auto_commit=True)  
+    consumer = KafkaConsumer(input_topic_Name,
+    bootstrap_servers=bootstrap_server_addr, auto_offset_reset='earliest')       
     
-    # Read and print message from consumer
+    # Read and print message from consumer and add in a list in an ordered manner 
     for msg in consumer:
-     print("Posting message in Topic Name=%s,Message=%s"%(msg.topic,msg.value.decode('UTF-8')))  
-     print("Press ctrl+c to run multiplexer & send all data to data-input in sorted order")  
+     print("Collecting message from Topic = %s,Message = %s"%(msg.topic,msg.value.decode('UTF-8')))  
+     print("")  
+     print("Press ctrl+c to run multiplexer & send all data to %s in sorted order"%(output_topic_Name)) 
      insert(int(msg.value))
 
     # Terminate the script
@@ -55,9 +59,16 @@ if __name__ == "__main__":
       # do nothing here
       pass
    print("sending data to multiplexer")
-  
-   producer = KafkaProducer(bootstrap_servers='localhost:29092')
+
+   # initialize the producer
+   producer = KafkaProducer(bootstrap_servers=bootstrap_server_addr,retries=5)
+
+   # send the ordered messages to data-output topic
+   count =0
    for index in range(len(msglist)): 
     msg= str(msglist[index]).encode('UTF-8')
-    print("Posting message in Topic Name=data-output , Message=%s"%(msg))  
-    producer.send('data-output', msg)
+    print("Posting message in Topic = %s , Message = %s"%(output_topic_Name,msg))  
+    producer.send(output_topic_Name, msg)
+    count = count + 1
+
+    print("Successfully posted = %s Messages"%(count))  
