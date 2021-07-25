@@ -49,8 +49,7 @@
         python producer.py
 
         # Run multiplexer to read from data-input topic, sort data finally write the data to data-output topic
-        python multiplexer.py
-        NB: press ctrl+c to send the out put to data-output topic 
+        python multiplexer.py         
 
         # Verify the sorted output in topic data-output
         docker run --net=host --rm confluentinc/cp-kafka:latest kafka-console-consumer --bootstrap-server localhost:29092 --topic data-output --from-beginning
