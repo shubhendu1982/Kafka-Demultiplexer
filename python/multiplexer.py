@@ -1,3 +1,7 @@
+"""
+This file is used for reading the data from data-input(all partitions) kafka topic
+and write it back in data-output in an ordered fashion 
+"""
 # Import Kafka libs from Kafka library
 from kafka import KafkaConsumer
 from kafka import KafkaProducer

@@ -1,3 +1,7 @@
+"""
+This file used for producing the data as per input.txt file into data-input kafka topic 
+"""
+
 # Import KafkaConsumer from Kafka library
 from kafka import KafkaProducer
 

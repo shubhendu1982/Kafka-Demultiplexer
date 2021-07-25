@@ -1,3 +1,10 @@
+"""
+This file is used for reading the data from from a specified partition passed as command line
+from data-input topic and write it back in data-output in an ordered fashion 
+It will read the message from a particular partition hence can be treated like 
+seperate consumers and can be scaled and run in parallel as per the requirement  
+"""
+
 # Import Kafka libs from Kafka library
 from kafka import KafkaConsumer
 from kafka import KafkaProducer
