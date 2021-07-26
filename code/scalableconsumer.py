@@ -13,36 +13,36 @@ from kafka import TopicPartition
 # Import sys module
 import sys
 
-# global messge array holds temporarily the messages from kafka topic 
+# Global messge array holds temporarily the messages from kafka topic 
 msglist = []
 
-# configurations
+# Configurations we can move this to a config file depending upon the requirement
 #-------------------------------------------------------------------------
-# set the kafka server url
+# Kafka server url
 bootstrap_server_addr =  'localhost:29092'
 
-# set input topic name
+# Set input & output topic name
 input_topic_Name = 'data-input'
 output_topic_Name = 'data-output'
 #-------------------------------------------------------------------------
 
-# validate total arguments
+# Validate total arguments
 n = len(sys.argv)
 if(n!=2) :
    print("Partition id needs to be passed")
    sys.exit()
 
-# check supplied partition no for integer
+# Check supplied partition no for integer
 if(not sys.argv[1].isdigit()):
     print("Invalid Partition id it needs to be an integer value")
     sys.exit()
 
 partition_no = int(sys.argv[1])
 
-# print partition no
+# Print partition no
 print("Partitation Id=%s"%(partition_no))     
 
-# insert item in msglist so that it remain sorted after insertation
+# Insert item in msglist so that it remain sorted after insertation
 def insert(n):    
     global msglist 
     i= 0
@@ -53,15 +53,15 @@ def insert(n):
             break
         else: i = -1
 
-    if i!= -1:
-        # Inserting n in the list
+    # Inserting n in the list
+    if i!= -1:        
         msglist = msglist[:i] + [n] + msglist[i:]          
     else:
         msglist.append(n)
 
 # Get all messages from data-input topic in put in a global list msglist
 def getMessages(): 
-# Define server with port     
+    # Define server with port     
     consumer = KafkaConsumer(
     bootstrap_servers=bootstrap_server_addr, auto_offset_reset='earliest')
    
@@ -70,7 +70,7 @@ def getMessages():
     # Read the specified partition
     consumer.assign([tp])   
 
-      # obtain the last offset value
+    # Obtain the last offset value
     consumer.seek_to_end(tp)
     lastOffset = consumer.position(tp)
     consumer.seek_to_beginning(tp)
@@ -80,17 +80,18 @@ def getMessages():
      print("Collecting message from Topic = %s,Message = %s, Partitation = %s"%(msg.topic,msg.value.decode('UTF-8'),partition_no))  
      insert(int(msg.value))
 
+    # Break the loop once all messages is consumed
      if msg.offset == lastOffset - 1:
             break
-# post messages to kafka data-output topic
+# Post messages to kafka data-output topic
 def postMessages():
 
-   # initialize the producer
+   # Initialize the producer
     producer = KafkaProducer(bootstrap_servers=bootstrap_server_addr,retries=5) 
 
     count = 0
 
-    # send the ordered messages to data-output topic
+    # Send the ordered messages to data-output topic
     for index in range(len(msglist)): 
       msg= str(msglist[index]).encode('UTF-8')
       print("Posting message in Topic = %s , Message = %s"%(output_topic_Name,msg))  
@@ -99,7 +100,7 @@ def postMessages():
 
     print("Successfully posted = %s Messages"%(count)) 
 
-## all app logic here
+## All app logic here
 def main():  
     
     # Retrive messages from kafka data-input topic for spefied partition and store in a list in sorted manner
@@ -109,7 +110,7 @@ def main():
     print("sending data to multiplexer...............")
     print("------------------------------------------")    
 
-    # post messages to kafka data-output topic
+    # Post messages to kafka data-output topic
     postMessages()
 
 if __name__ == "__main__":  

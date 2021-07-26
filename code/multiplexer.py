@@ -6,26 +6,30 @@ and write it back in data-output in an ordered fashion
 from kafka import KafkaConsumer
 from kafka import KafkaProducer
 
-# Import sys module
+import os
 import sys
 
-# global messge array holds temporarily the messages from kafka topic 
+# Global messge array holds temporarily the messages from kafka topic 
 msglist = []
 
-# configurations
+# Configurations we can move this to a config file depending upon the requirement
 #-------------------------------------------------------------------------
-# set the kafka server url
+# Kafka server url
 bootstrap_server_addr =  'localhost:29092'
 
-# set input topic name
+# Set input & output topic name
 input_topic_Name = 'data-input'
 output_topic_Name = 'data-output'
-#-------------------------------------------------------------------------  
-# get number of messages
-def getNumberOfMessages():  
-    return sum(1 for line in open('input.txt'))
 
-# insert item in msglist so that it remain sorted after insertation
+# input file name to feed data into kafka topic in "<partition no>:<value>" format 
+input_file = "input.txt"
+#-------------------------------------------------------------------------  
+
+# Get number of messages tobe posted in kafka topic from the input file
+def getNumberOfMessages():  
+    return sum(1 for line in open(os.path.join(sys.path[0], input_file), "r"))
+
+# Insert item in msglist so that it remain sorted after insertation
 def insert(n):    
     global msglist 
     i= 0
@@ -44,9 +48,11 @@ def insert(n):
 
 # Get all messages from data-input topic in put in a global list msglist
 def getMessages(): 
-# Define server with port 
+
+    # Get number of messages tobe posted in kafka topic
     lastOffset = getNumberOfMessages()
-    # Initialize consumer variable
+    
+    # Define server with port and start reading from beginning of the kafka stream
     consumer = KafkaConsumer(input_topic_Name,
     bootstrap_servers=bootstrap_server_addr, auto_offset_reset='earliest')       
     
@@ -55,28 +61,30 @@ def getMessages():
     for msg in consumer:
      print("Collecting message from Topic = %s,Message = %s"%(input_topic_Name,msg.value.decode('UTF-8')))     
      insert(int(msg.value))
-     count = count + 1     
-     # end of message
+     count = count + 1  
+
+     # Break the loop once all messages is consumed
      if count == lastOffset:
             break
 
-# post messages to kafka data-output topic from msglist
+# Post messages to kafka data-output topic from msglist
 def postMessages():
 
-    # initialize the producer
-     producer = KafkaProducer(bootstrap_servers=bootstrap_server_addr,retries=5)
+    # Initialize the producer
+    producer = KafkaProducer(bootstrap_servers=bootstrap_server_addr,retries=5)
 
-    # send the ordered messages to data-output topic
-     count =0
-     for index in range(len(msglist)): 
-            msg= str(msglist[index]).encode('UTF-8')
-            print("Posting message in Topic = %s , Message = %s"%(output_topic_Name,msg))  
-            producer.send(output_topic_Name, msg)
-            count = count + 1
+    # Send the ordered messages to data-output topic
+    count =0
 
-            print("Successfully posted = %s Messages"%(count))
+    for index in range(len(msglist)): 
+       msg= str(msglist[index]).encode('UTF-8')
+       print("Posting message in Topic = %s , Message = %s"%(output_topic_Name,msg))  
+       producer.send(output_topic_Name, msg)
+       count = count + 1
 
-## all app logic here
+    print("Successfully posted = %s Messages"%(count))
+
+# All app logic here
 def main():  
     
      # Retrive messages from kafka data-input topic and store in a list in sorted manner
@@ -86,7 +94,7 @@ def main():
      print("sending data to multiplexer...............")
      print("------------------------------------------")
 
-     # post messages to kafka data-output topic
+     # Post messages to kafka data-output topic
      postMessages()
 
 if __name__ == "__main__":

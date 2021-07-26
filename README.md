@@ -10,10 +10,10 @@
          N.B check all services are up and running using command docker-compose logs -f 
 
     # 3) Create topic with name data-input 
-         docker run --net=host --rm confluentinc/cp-kafka:latest kafka-topics --create --topic data-input --partitions 10 --replication-factor 1 --if-not-exists --zookeeper  localhost:22181
+         docker run --net=host --rm confluentinc/cp-kafka:6.2.0 kafka-topics --create --topic data-input --partitions 10 --replication-factor 1 --if-not-exists --zookeeper  localhost:22181
 
     # 4) Create topic with name data-output
-         docker run --net=host --rm confluentinc/cp-kafka:latest kafka-topics --create --topic data-output --partitions 1 --replication-factor 1 --if-not-exists --zookeeper  localhost:22181
+         docker run --net=host --rm confluentinc/cp-kafka:6.2.0 kafka-topics --create --topic data-output --partitions 1 --replication-factor 1 --if-not-exists --zookeeper  localhost:22181
 
 # Task 2 - Simple Consumer
     # a) Come up with a simple algorithm to read the messages and write them to data-output in the desired way
@@ -34,25 +34,22 @@
 
     # b) Realize your algorithm from a) in python3 using you Environment from Task 1.
         
-         - producer.py -- used for producing the data as per input.txt file
-         - multiplexer.py - used for reading the data from data-input(all partitions) and write it back in data-output in an ordered fashion 
-         - input.txt - used to provide input to producer.py for data creation
-
-        # Change dir to python dir
-        cd .\python\
+         - .\code\producer.py -- used for producing the data as per input.txt file
+         - .\code\multiplexer.py - used for reading the data from data-input(all partitions) and write it back in data-output in an ordered fashion 
+         - .\code\input.txt - used to provide input to producer.py for data creation       
 
         # Install kafka-python client lib used to operate on kafka cluster
         pip install kafka-python
         NB: it is assumed python compiler is already installed (i have used Python 3.9.6)
 
         # Produce data in kafka from input.txt with is in key:value format where key is the partitation no and value is the value to be set in the partitation in data-input topic
-        python producer.py
+        python .\code\producer.py
 
         # Run multiplexer to read from data-input topic, sort data finally write the data to data-output topic
-        python multiplexer.py         
+        python .\code\multiplexer.py         
 
         # Verify the sorted output in topic data-output
-        docker run --net=host --rm confluentinc/cp-kafka:latest kafka-console-consumer --bootstrap-server localhost:29092 --topic data-output --from-beginning
+        docker run --net=host --rm confluentinc/cp-kafka:6.2.0 kafka-console-consumer --bootstrap-server localhost:29092 --topic data-output --from-beginning --timeout-ms 5000
 
 # Task 3 - Scalable Consumer
 
@@ -62,20 +59,20 @@
       
     # b) Extend your implementation from 2b by the functionality described in 2a.
     
-        - producer.py -- used for producing the data as per input.txt file
-        - scalableconsumer.py - used for reading the data from data-input(commandline specified partition) and write it back  in data-output in an ordered fashion 
-        - input.txt - used to provide input to producer.py for data creation
+        - .\code\producer.py -- used for producing the data as per input.txt file
+        - .\code\scalableconsumer.py - used for reading the data from data-input(commandline specified partition) and write it back  in data-output in an ordered fashion 
+        - .\code\input.txt - used to provide input to producer.py for data creation
 
         The below command can be used in order to read from a specified partition of a topic and hence it will be able to scale it self by specifying the command line argument to pass the partition no        
-        in the format scalableconsumer.py <partition no>  
+        in the format .\code\scalableconsumer.py <partition no>  
 
             The pogram can be executed parally like below exemple
-            python .\scalableconsumer.py 0
-            python .\scalableconsumer.py 1
-            python .\scalableconsumer.py 2
-            python .\scalableconsumer.py 3
-            python .\scalableconsumer.py 4
+            python .\code\scalableconsumer.py 0
+            python .\code\scalableconsumer.py 1
+            python .\code\scalableconsumer.py 2
+            python .\code\scalableconsumer.py 3
+            python .\code\scalableconsumer.py 4
             .....
-            python .\scalableconsumer.py 9
+            python .\code\scalableconsumer.py 9
 
             which will read the message from a particular partition hence can be treated like seperate consumers and can be scaled and run in parallel as per the requirement  
