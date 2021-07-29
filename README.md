@@ -9,27 +9,30 @@
          docker-compose up -d
          N.B check all services are up and running using command docker-compose logs -f 
 
-    # 3) Create topic with name data-input 
+    # 3) Create topic with name data-input with 10 partitions
          docker run --net=host --rm confluentinc/cp-kafka:6.2.0 kafka-topics --create --topic data-input --partitions 10 --replication-factor 1 --if-not-exists --zookeeper  localhost:22181
 
-    # 4) Create topic with name data-output
+    # 4) Create topic with name data-output with 1 partitions
          docker run --net=host --rm confluentinc/cp-kafka:6.2.0 kafka-topics --create --topic data-output --partitions 1 --replication-factor 1 --if-not-exists --zookeeper  localhost:22181
 
 # Task 2 - Simple Consumer
     # a) Come up with a simple algorithm to read the messages and write them to data-output in the desired way
     
-        # intert item in sorted order in the list            
-            1) # search for right index where the data needs to be inserted to maintain the sorted order                       
+        # Intert "item" in sorted order in the list so that after insertion list remain sorted             
+            1) # Searching for the position i, where left side of the array < item and right side > item   
+               # If i remains -1 after full iteration "item"" has be appended at the end of the list   
+
                     for i in range(len(msglist)):    
-                        if msglist[i] > n:
+                        if msglist[i] > item:
                             index = i
                             break
                         else: i = -1                    
         
-            2) # Inserting the item in the list in the index determined in the previous stage            
+            2) # Inserting the "item" in the list in the index determined in the previous stage            
                     if i!= -1:                        
-                        msglist = msglist[:i] + [n] + msglist[i:]          
+                        msglist = msglist[:i] + [item] + msglist[i:]          
                     else:
+               # All values in the list are less than or equal to item so we need to appended "item" at the end of the list
                         msglist.append(n)            
 
     # b) Realize your algorithm from a) in python3 using you Environment from Task 1.

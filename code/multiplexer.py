@@ -33,17 +33,19 @@ def getNumberOfMessages():
 def insert(n):    
     global msglist 
     i= 0
-    # Searching for the position   
+    # Searching for the position i, where left side of the array <n and right side >n   
+    # If i remains -1 after full iteration it has be appended at the end of the list 
     for i in range(len(msglist)):    
         if msglist[i] > n:
             index = i
             break
         else: i = -1
      
-    # Inserting n in the list
+    # Inserting n in the list in i-th pisition 
     if i!= -1:        
         msglist = msglist[:i] + [n] + msglist[i:]          
     else:
+    # All values in the list are less than or equal to n so we need to appended n at the end of the list 
         msglist.append(n)
 
 # Get all messages from data-input topic in put in a global list msglist
