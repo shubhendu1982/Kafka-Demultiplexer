@@ -1,7 +1,11 @@
 # Kafka-Demultiplexer
 
 # Task 1 - Reproducible Environment - Setup single node kafka cluster environment
-     
+     Used docker-compose.yml file in order to setup single node kafka cluster environment. Below are the images used for setting up the environment
+
+     cp-kafka:6.2.0 - Docker Image for Kafka
+     cp-zookeeper:6.2.0 - Docker Image for Zookeeper to store kafka metadata
+
     # 1) Pull Zookeeper and kafka docker image
          docker-compose pull
 
